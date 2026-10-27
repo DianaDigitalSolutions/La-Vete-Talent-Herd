@@ -35,7 +35,7 @@ Postuló → Entrevistado → Oferta enviada → Contratado / Rechazado. «Mover
 La app usa siempre la paleta azul veterinario y modo claro fijo (sin modo oscuro).
 
 ## Datos de ejemplo
-Se cargan solo si `localStorage` está vacío o corrupto: 18 postulantes en Curridabat, Escazú, San Pedro y Heredia, en todas las etapas, con fechas relativas al día actual. Incluye 3 en «Entrevistado» con más de 5 días, nombres con acento/guion (María-José Araya, Valeria Montero-Castro) y Escazú·Veterinario con todas sus plazas contratadas.
+Se cargan solo si `localStorage` está vacío o corrupto: 19 postulantes en Curridabat, Escazú, San Pedro y Heredia, en todas las etapas, con fechas relativas al día actual. Incluye 3 en «Entrevistado» con más de 5 días, nombres con acento/guion (María-José Araya, Valeria Montero-Castro) y Escazú·Veterinario con todas sus plazas contratadas y una oferta enviada.
 
 ## localStorage
 Clave: **`lavete-datos-v1`**. Para restablecer los datos: en la consola del navegador ejecute `localStorage.removeItem("lavete-datos-v1")` y recargue. Lecturas y escrituras están protegidas con try/catch y validación del JSON.
