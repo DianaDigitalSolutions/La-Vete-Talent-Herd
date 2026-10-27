@@ -69,12 +69,13 @@ function Index() {
   return (
     <div className="min-h-screen bg-vet text-base leading-relaxed text-blanco">
       <header className="sticky top-0 z-20 bg-vet-oscuro text-blanco shadow-md" style={{ paddingTop: "env(safe-area-inset-top)" }}>
-        <div className="mx-auto flex max-w-5xl items-center gap-3 px-4 py-2">
+        <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-3 gap-y-1 px-4 py-2 sm:flex-nowrap">
           <div className="min-w-0 flex-1">
             <p className="font-display text-xl font-extrabold leading-tight">La Vete</p>
-            <p className="truncate text-xs text-blanco">{perfil === "admin" ? "Administración" : "RRHH"} · Total de vacantes: <b className="text-hoja">{total}</b></p>
+            <p className="text-xs text-blanco"><span>{perfil === "admin" ? "Administración" : "RRHH"}</span><span className="hidden sm:inline"> · Total de vacantes: <b className="text-hoja">{total}</b></span></p>
           </div>
-          <button className={`${btn} border border-blanco/30 text-sm text-blanco hover:bg-blanco/10`} onClick={() => setPerfil(null)}>Cambiar de perfil</button>
+          <button className={`${btn} shrink-0 border border-blanco/30 text-sm text-blanco hover:bg-blanco/10`} onClick={() => setPerfil(null)}>Cambiar de perfil</button>
+          <p className="order-last w-full min-w-0 text-xs text-blanco sm:hidden">Total de vacantes: <b className="text-hoja">{total}</b></p>
         </div>
         <nav className="mx-auto flex max-w-5xl px-2">
           {([["post", "Postulaciones"], ["vac", "Vacantes"]] as const).map(([k, l]) => (
