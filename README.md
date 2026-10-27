@@ -55,3 +55,6 @@ Los botones «Enviar correo» y «Enviar WhatsApp» están **simulados en el có
 
 ## Próximos pasos
 Kodarvia integrará backend, políticas de acceso y despliegue.
+
+- Los envíos de correo y WhatsApp ocurren únicamente al pulsar el botón en la ficha y siguen simulados en el código (sin llamadas de red).
+- La app usa siempre modo claro, aunque el teléfono esté en modo oscuro.

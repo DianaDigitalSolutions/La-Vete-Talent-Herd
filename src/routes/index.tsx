@@ -250,13 +250,16 @@ function Postulaciones({ datos, actualizar, avisar }: { datos: Datos; actualizar
   );
 }
 
+const cntCls: Record<Etapa, string> = { "Postuló": "bg-[#CFE3EC] text-[#16303E]", "Entrevistado": "bg-[#9FC4D6] text-[#16303E]", "Oferta enviada": "bg-[#CDE6D1] text-[#16303E]", "Contratado": "bg-[#6FAE7B] text-[#16303E]", "Rechazado": "bg-[#16303E] text-[#FFFFFF]" };
+
 function Ficha({ p, datos, actualizar, avisar, onClose }: { p: Postulante; datos: Datos; actualizar: (d: Datos) => void; avisar: (m: string) => void; onClose: () => void }) {
   const [editar, setEditar] = useState(false);
   const [nota, setNota] = useState("");
   const [errMov, setErrMov] = useState("");
   const set = (np: Postulante) => actualizar({ ...datos, postulantes: datos.postulantes.map((x) => (x.id === p.id ? np : x)) });
   const mv = (e: Etapa) => { const r = mover(datos, p.id, e); if (r.error) setErrMov(r.error); else { setErrMov(""); actualizar(r.datos); avisar(`Movido a «${e}»`); } };
-  const enviar = (c: "Correo" | "WhatsApp") => { set({ ...p, mensajes: [sendMessage(p, c), ...p.mensajes] }); avisar("Enviado"); };
+  const [enviando, setEnviando] = useState(false);
+  const enviar = (c: "Correo" | "WhatsApp") => { if (enviando) return; setEnviando(true); setTimeout(() => setEnviando(false), 1000); const m = sendMessage(p, c); set({ ...p, mensajes: [m, ...p.mensajes] }); avisar("Enviado"); };
   const sig: Partial<Record<Etapa, Etapa>> = { "Postuló": "Entrevistado", "Entrevistado": "Oferta enviada" };
   const sec = "rounded-2xl border border-vet/20 bg-blanco p-3 shadow-sm";
   const cub = avisarPostulante(datos, p);
@@ -297,8 +300,8 @@ function Ficha({ p, datos, actualizar, avisar, onClose }: { p: Postulante; datos
           </section>
           {(p.correo || p.whatsapp) && (
             <section className={`${sec} grid grid-cols-2 gap-2`}>
-              {p.correo && <button className={aSec} onClick={() => enviar("Correo")}>Enviar correo</button>}
-              {p.whatsapp && <button className={aSec} onClick={() => enviar("WhatsApp")}>Enviar WhatsApp</button>}
+              {p.correo && <button className={aSec} disabled={enviando} onClick={() => enviar("Correo")}>Enviar correo</button>}
+              {p.whatsapp && <button className={aSec} disabled={enviando} onClick={() => enviar("WhatsApp")}>Enviar WhatsApp</button>}
             </section>
           )}
           <section className={sec}>
@@ -358,15 +361,15 @@ function Vacantes({ datos, actualizar, admin, avisar }: { datos: Datos; actualiz
           const occ = PUESTOS.reduce((a, p) => a + Math.min(ocupadas(datos, s, p), plazasDe(datos, s, p)), 0);
           const estado = tot === 0 ? ["Sin vacantes", "border border-vet bg-et1 text-tinta"] : occ >= tot ? ["Completa", "bg-hoja text-tinta"] : ["Con plazas disponibles", "bg-vet text-blanco"];
           return (
-            <section key={s} className={`${card} p-3`}>
-              <div className="flex flex-wrap items-center gap-2"><h2 className="flex-1 font-display text-lg font-bold">{s}</h2><span className={`rounded-full px-2 py-1 text-xs font-bold ${estado[1]}`}>{estado[0]}</span></div>
-              {tot === 0 ? <p className="mt-2 text-sm text-tinta/80">No hay vacantes abiertas en esta sede.</p> : PUESTOS.filter((p) => plazasDe(datos, s, p)).map((p) => {
+            <section key={s} className="rounded-2xl border border-[#9FC4D6] bg-[#EAF3F7] p-4 text-[#16303E] shadow-[0_2px_8px_rgba(22,48,62,0.12)]">
+              <div className="flex flex-wrap items-center gap-2"><h2 className="flex-1 font-display text-lg font-bold text-[#1F5C7A]">{s}</h2><span className={`rounded-full px-2 py-1 text-xs font-bold ${estado[1]}`}>{estado[0]}</span></div>
+              {tot === 0 ? <p className="mt-2 text-sm text-[#16303E]">No hay vacantes abiertas en esta sede.</p> : PUESTOS.filter((p) => plazasDe(datos, s, p)).map((p) => {
                 const t = plazasDe(datos, s, p), o = ocupadas(datos, s, p);
                 return (
-                  <div key={p} className="mt-3 rounded-xl bg-blanco p-3">
-                    <div className="flex items-center gap-2"><p className="flex-1 font-semibold">{p}</p><p className="text-sm font-bold">{o} de {t} plazas ocupadas</p></div>
-                    <div className="mt-2 h-2 overflow-hidden rounded-full bg-tinta/10"><div className="h-full bg-hoja" style={{ width: `${Math.min(100, (o / t) * 100)}%` }} /></div>
-                    <div className="mt-2 flex flex-wrap gap-1">{ETAPAS.map((e) => <span key={e} className={`rounded-full px-2 py-1 text-xs font-semibold ${etapaCls[e]}`}>{e}: {datos.postulantes.filter((x) => x.sede === s && x.puesto === p && x.etapa === e).length}</span>)}</div>
+                  <div key={p} className="mt-3 rounded-xl bg-[#FFFFFF] p-3 text-[#16303E]">
+                    <div className="flex items-center gap-2"><p className="flex-1 text-sm font-semibold text-[#16303E]">{p}</p><p className="text-sm font-bold text-[#16303E]">{o} de {t} plazas ocupadas</p></div>
+                    <div className="mt-2 h-2 overflow-hidden rounded-full bg-[#CFE3EC]"><div className="h-full bg-[#6FAE7B]" style={{ width: `${Math.min(100, (o / t) * 100)}%` }} /></div>
+                    <div className="mt-2 flex flex-wrap gap-1">{ETAPAS.map((e) => <span key={e} className={`rounded-full px-2 py-1 text-sm ${cntCls[e]}`}>{e}: <b>{datos.postulantes.filter((x) => x.sede === s && x.puesto === p && x.etapa === e).length}</b></span>)}</div>
                   </div>
                 );
               })}
