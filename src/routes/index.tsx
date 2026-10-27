@@ -321,10 +321,10 @@ function Vacantes({ datos, actualizar, admin, avisar }: { datos: Datos; actualiz
   const [e, setE] = useState<Record<string, string>>({});
   const crear = () => {
     const er: Record<string, string> = {};
-    if (!f.sede) er.sede = "Seleccione la sede.";
-    if (!f.puesto) er.puesto = "Seleccione el puesto.";
+    if (!f.sede) er["sede"] = "Seleccione la sede.";
+    if (!f.puesto) er["puesto"] = "Seleccione el puesto.";
     const n = Number(f.plazas);
-    if (!Number.isInteger(n) || n < 1) er.plazas = "Ingrese un número entero mayor o igual a 1.";
+    if (!Number.isInteger(n) || n < 1) er["plazas"] = "Ingrese un número entero mayor o igual a 1.";
     setE(er);
     if (Object.keys(er).length) return;
     actualizar(agregarVacante(datos, f.sede as Sede, f.puesto as Puesto, n));

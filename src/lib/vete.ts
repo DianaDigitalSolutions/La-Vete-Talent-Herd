@@ -91,7 +91,7 @@ export function seed(now = Date.now()): Datos {
     i++;
     return {
       id: "p" + i, nombre, puesto, sede, telefono: tel, whatsapp: tel,
-      correo: tel ? normalizar(nombre.split(" ")[0]) + "." + i + "@correo.cr" : "",
+      correo: tel ? normalizar((nombre.split(" ")[0] ?? "")) + "." + i + "@correo.cr" : "",
       etapa, fechas, notas: notas.map((t, k) => ({ texto: t, fecha: back(dias + k) })), mensajes: [],
     };
   };
