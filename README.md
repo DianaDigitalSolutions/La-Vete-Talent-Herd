@@ -21,15 +21,18 @@ Pruebas de reglas: `bunx vitest run`.
 Curridabat, Escazú, San Pedro, Tibás, Heredia, Alajuela, Cartago.
 
 ## Reglas de etapas
-Postuló → Entrevistado → Oferta enviada → Contratado / Rechazado. «Mover a la siguiente etapa» avanza una sola posición; desde «Oferta enviada» se elige «Contratado» o «Rechazado»; en esas dos no hay más movimientos. Se guarda la fecha de ingreso a cada etapa. Quien esté en «Entrevistado» más de 5 días muestra «Más de 5 días sin avanzar».
+Postuló → Entrevistado → Oferta enviada → Contratado / Rechazado. «Mover a la siguiente etapa» avanza una sola posición; desde «Oferta enviada» se elige «Contratado» o «Rechazado»; en esas dos no hay más movimientos. Excepción única: quien muestra «Plazas cubiertas: avisar al postulante» tiene además el botón «Rechazar: plazas cubiertas», que lo pasa directo a «Rechazado» y agrega la nota «Rechazado: plazas de la sede ya cubiertas» con fecha. Nunca es automático. Se guarda la fecha de ingreso a cada etapa. Quien esté en «Entrevistado» más de 5 días muestra «Más de 5 días sin avanzar».
 
 ## Reglas de cupo (por sede + puesto)
 - Plazas = suma de las vacantes de esa sede y puesto (las vacantes repetidas se suman).
-- «Oferta enviada» y «Contratado» ocupan plaza; «Rechazado» la libera.
-- No se puede mover a «Oferta enviada» si las plazas ocupadas igualan el total.
+- Solo «Contratado» ocupa plaza; «Oferta enviada» y «Rechazado» no. Disponibles = plazas − contratados (mínimo 0).
+- Enviar ofertas nunca se bloquea por cupo. Solo se bloquea pasar a «Contratado» si los contratados igualan las plazas.
 - No se permite el alta si no hay vacante o si todas las plazas están contratadas.
-- Si todas están contratadas, quienes siguen en Postuló/Entrevistado muestran «Plazas cubiertas: avisar al postulante».
+- Si todas están contratadas, quienes siguen en Postuló/Entrevistado/Oferta enviada muestran «Plazas cubiertas: avisar al postulante».
 - El total de vacantes de la cadena (cabecera) es solo informativo.
+
+## Diseño
+La app usa siempre la paleta azul veterinario y modo claro fijo (sin modo oscuro).
 
 ## Datos de ejemplo
 Se cargan solo si `localStorage` está vacío o corrupto: 18 postulantes en Curridabat, Escazú, San Pedro y Heredia, en todas las etapas, con fechas relativas al día actual. Incluye 3 en «Entrevistado» con más de 5 días, nombres con acento/guion (María-José Araya, Valeria Montero-Castro) y Escazú·Veterinario con todas sus plazas contratadas.
