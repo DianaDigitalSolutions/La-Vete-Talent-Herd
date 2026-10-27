@@ -18,6 +18,15 @@
  * 2. Register it in @theme inline as --color-<name>: var(--<name>)
  */
 
+@theme {
+  --color-vet: #1f5c7a;
+  --color-blanco: #ffffff;
+  --color-hoja: #6fae7b;
+  --color-tinta: #16303e;
+  --font-display: "Nunito", system-ui, sans-serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+}
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
