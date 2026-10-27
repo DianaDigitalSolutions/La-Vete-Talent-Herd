@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
-  ADMIN_CLAVE, ETAPAS, PUESTOS, SEDES, agregarVacante, avisarPostulante, cargar, conDemora, correoValido,
+  ADMIN_CLAVE, ETAPAS, PUESTOS, SEDES, agregarVacante, avisarPostulante, cargar, conDemora, cubiertas, rechazarPorCupo, correoValido,
   disponibles, errorAlta, fmt, guardar, mover, normalizar, ocupadas, plazasDe, sendMessage, telValido, uid,
   type Datos, type Etapa, type Postulante, type Puesto, type Sede,
 } from "@/lib/vete";
@@ -24,14 +24,18 @@ type Perfil = "rrhh" | "admin";
 const btn = "min-h-11 rounded-xl px-4 font-semibold transition active:scale-[.98] disabled:opacity-50";
 const bPri = `${btn} bg-vet text-blanco hover:bg-vet/90`;
 const bSec = `${btn} border border-vet/30 bg-blanco text-vet hover:bg-vet/5`;
+const aPri = `${btn} bg-hoja font-bold text-tinta hover:bg-hoja/90 disabled:opacity-60`;
+const aSec = `${btn} bg-vet text-blanco hover:bg-vet/90 disabled:opacity-60`;
+const aInp = "min-h-11 w-full rounded-xl border border-vet bg-campo px-3 text-base text-tinta placeholder:text-tinta/75 focus:outline-none focus:ring-2 focus:ring-vet/40";
+const card = "rounded-2xl border border-vet/20 bg-claro text-tinta shadow-md";
 const inp = "min-h-11 w-full rounded-xl border border-tinta/20 bg-blanco px-3 text-base text-tinta focus:border-vet focus:outline-none focus:ring-2 focus:ring-vet/30";
 
 const etapaCls: Record<Etapa, string> = {
-  "Postuló": "bg-vet/10 text-vet",
-  "Entrevistado": "bg-vet/20 text-tinta",
-  "Oferta enviada": "bg-hoja/25 text-tinta",
-  "Contratado": "bg-hoja text-blanco",
-  "Rechazado": "bg-tinta/10 text-tinta/70",
+  "Postuló": "border border-et2 bg-et1 text-tinta",
+  "Entrevistado": "border border-vet bg-et2 text-tinta",
+  "Oferta enviada": "border border-hoja bg-et3 text-tinta",
+  "Contratado": "border border-hoja-oscuro bg-hoja text-tinta",
+  "Rechazado": "border border-tinta bg-tinta text-blanco",
 };
 
 const Reloj = () => (
@@ -45,7 +49,7 @@ function Demora() {
   return <span className="inline-flex items-center gap-1 rounded-full bg-tinta px-2 py-1 text-xs font-semibold text-blanco"><Reloj />Más de 5 días sin avanzar</span>;
 }
 function Cubiertas() {
-  return <span className="inline-flex rounded-full border border-hoja bg-hoja/15 px-2 py-1 text-xs font-semibold text-tinta">Plazas cubiertas: avisar al postulante</span>;
+  return <span className="inline-flex rounded-full border border-hoja-oscuro bg-hoja px-2 py-1 text-xs font-semibold text-tinta">Plazas cubiertas: avisar al postulante</span>;
 }
 
 function Index() {
@@ -63,18 +67,18 @@ function Index() {
   const total = datos.vacantes.reduce((a, v) => a + v.plazas, 0);
 
   return (
-    <div className="min-h-screen bg-blanco text-tinta">
-      <header className="sticky top-0 z-20 bg-tinta text-blanco shadow-md" style={{ paddingTop: "env(safe-area-inset-top)" }}>
+    <div className="min-h-screen bg-vet text-base leading-relaxed text-blanco">
+      <header className="sticky top-0 z-20 bg-vet-oscuro text-blanco shadow-md" style={{ paddingTop: "env(safe-area-inset-top)" }}>
         <div className="mx-auto flex max-w-5xl items-center gap-3 px-4 py-2">
           <div className="min-w-0 flex-1">
             <p className="font-display text-xl font-extrabold leading-tight">La Vete</p>
-            <p className="truncate text-xs text-blanco/70">{perfil === "admin" ? "Administración" : "RRHH"} · Total de vacantes: <b className="text-hoja">{total}</b></p>
+            <p className="truncate text-xs text-blanco">{perfil === "admin" ? "Administración" : "RRHH"} · Total de vacantes: <b className="text-hoja">{total}</b></p>
           </div>
           <button className={`${btn} border border-blanco/30 text-sm text-blanco hover:bg-blanco/10`} onClick={() => setPerfil(null)}>Cambiar de perfil</button>
         </div>
         <nav className="mx-auto flex max-w-5xl px-2">
           {([["post", "Postulaciones"], ["vac", "Vacantes"]] as const).map(([k, l]) => (
-            <button key={k} onClick={() => setTab(k)} className={`min-h-11 flex-1 border-b-4 font-display font-bold ${tab === k ? "border-hoja text-blanco" : "border-transparent text-blanco/60"}`}>{l}</button>
+            <button key={k} onClick={() => setTab(k)} className={`min-h-11 flex-1 border-b-4 font-display font-bold ${tab === k ? "border-hoja bg-blanco/15 text-blanco" : "border-transparent text-blanco/85"}`}>{l}</button>
           ))}
         </nav>
       </header>
@@ -118,7 +122,7 @@ function Bienvenida({ onEntrar }: { onEntrar: (p: Perfil) => void }) {
 function Modal({ titulo, onClose, children }: { titulo: string; onClose: () => void; children: ReactNode }) {
   return (
     <div className="fixed inset-0 z-40 flex items-end justify-center bg-tinta/60 sm:items-center sm:p-4" onClick={onClose}>
-      <div className="flex max-h-[100dvh] w-full max-w-lg flex-col rounded-t-3xl bg-blanco sm:max-h-[90dvh] sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
+      <div className="flex max-h-[100dvh] w-full max-w-lg flex-col rounded-t-3xl bg-claro text-tinta shadow-xl sm:max-h-[90dvh] sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center gap-2 border-b border-tinta/10 px-4 py-2">
           <h2 className="min-w-0 flex-1 truncate font-display text-lg font-bold">{titulo}</h2>
           <button aria-label="Cerrar" className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-tinta/5" onClick={onClose}>
@@ -152,14 +156,14 @@ function FormPostulante({ inicial, onGuardar, aviso }: { inicial: Form; onGuarda
   const set = (k: keyof Form) => (ev: { target: { value: string } }) => setF({ ...f, [k]: ev.target.value });
   return (
     <form noValidate className="grid gap-3" onSubmit={(ev) => { ev.preventDefault(); const er = validar(f); setE(er); if (!Object.keys(er).length) onGuardar(f); }}>
-      {campo("nombre", "Nombre completo *", <input id="nombre" className={inp} value={f.nombre} onChange={set("nombre")} />)}
-      {campo("puesto", "Puesto *", <select id="puesto" className={inp} value={f.puesto} onChange={set("puesto")}><option value="">Seleccione…</option>{PUESTOS.map((p) => <option key={p}>{p}</option>)}</select>)}
-      {campo("sede", "Sede *", <select id="sede" className={inp} value={f.sede} onChange={set("sede")}><option value="">Seleccione…</option>{SEDES.map((s) => <option key={s}>{s}</option>)}</select>)}
-      {campo("telefono", "Teléfono", <input id="telefono" inputMode="tel" className={inp} value={f.telefono} onChange={set("telefono")} placeholder="8888-8888" />)}
-      {campo("whatsapp", "WhatsApp", <input id="whatsapp" inputMode="tel" className={inp} value={f.whatsapp} onChange={set("whatsapp")} placeholder="8888-8888" />)}
-      {campo("correo", "Correo", <input id="correo" type="email" className={inp} value={f.correo} onChange={set("correo")} placeholder="nombre@correo.cr" />)}
+      {campo("nombre", "Nombre completo *", <input id="nombre" className={aInp} value={f.nombre} onChange={set("nombre")} />)}
+      {campo("puesto", "Puesto *", <select id="puesto" className={aInp} value={f.puesto} onChange={set("puesto")}><option value="">Seleccione…</option>{PUESTOS.map((p) => <option key={p}>{p}</option>)}</select>)}
+      {campo("sede", "Sede *", <select id="sede" className={aInp} value={f.sede} onChange={set("sede")}><option value="">Seleccione…</option>{SEDES.map((s) => <option key={s}>{s}</option>)}</select>)}
+      {campo("telefono", "Teléfono", <input id="telefono" inputMode="tel" className={aInp} value={f.telefono} onChange={set("telefono")} placeholder="8888-8888" />)}
+      {campo("whatsapp", "WhatsApp", <input id="whatsapp" inputMode="tel" className={aInp} value={f.whatsapp} onChange={set("whatsapp")} placeholder="8888-8888" />)}
+      {campo("correo", "Correo", <input id="correo" type="email" className={aInp} value={f.correo} onChange={set("correo")} placeholder="nombre@correo.cr" />)}
       {aviso && <p role="alert" className="rounded-xl border border-vet bg-vet/10 p-3 text-sm font-semibold text-tinta">⚠ {aviso}</p>}
-      <button className={bPri}>Guardar</button>
+      <button className={aPri}>Guardar</button>
     </form>
   );
 }
@@ -185,7 +189,7 @@ function Postulaciones({ datos, actualizar, avisar }: { datos: Datos; actualizar
     <div className="grid gap-4">
       <div className="flex flex-wrap items-center gap-2">
         <h1 className="flex-1 font-display text-2xl font-bold">Postulaciones</h1>
-        <button className={bPri} onClick={() => { setAvisoAlta(""); setNuevo(true); }}>+ Nuevo postulante</button>
+        <button className={aPri} onClick={() => { setAvisoAlta(""); setNuevo(true); }}>+ Nuevo postulante</button>
       </div>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
         {ETAPAS.map((e) => (
@@ -196,12 +200,12 @@ function Postulaciones({ datos, actualizar, avisar }: { datos: Datos; actualizar
         ))}
       </div>
       <div className="grid gap-2 sm:grid-cols-3">
-        <input className={inp} placeholder="Buscar por nombre" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Buscar por nombre" />
-        <select className={inp} value={fSede} onChange={(e) => setFSede(e.target.value)} aria-label="Filtrar por sede"><option value="">Todas las sedes</option>{SEDES.map((s) => <option key={s}>{s}</option>)}</select>
-        <select className={inp} value={fEtapa} onChange={(e) => setFEtapa(e.target.value)} aria-label="Filtrar por etapa"><option value="">Todas las etapas</option>{ETAPAS.map((s) => <option key={s}>{s}</option>)}</select>
+        <input className={aInp} placeholder="Buscar por nombre" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Buscar por nombre" />
+        <select className={aInp} value={fSede} onChange={(e) => setFSede(e.target.value)} aria-label="Filtrar por sede"><option value="">Todas las sedes</option>{SEDES.map((s) => <option key={s}>{s}</option>)}</select>
+        <select className={aInp} value={fEtapa} onChange={(e) => setFEtapa(e.target.value)} aria-label="Filtrar por etapa"><option value="">Todas las etapas</option>{ETAPAS.map((s) => <option key={s}>{s}</option>)}</select>
       </div>
       {fSede && (
-        <section className="rounded-2xl bg-vet/5 p-3">
+        <section className={`${card} p-3`}>
           <h2 className="mb-2 font-display font-bold">Plazas en {fSede}</h2>
           <div className="grid grid-cols-2 gap-2">
             {PUESTOS.map((p) => {
@@ -212,16 +216,16 @@ function Postulaciones({ datos, actualizar, avisar }: { datos: Datos; actualizar
         </section>
       )}
       {lista.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-tinta/20 p-8 text-center text-tinta/70">
+        <div className="rounded-2xl border border-dashed border-blanco/50 p-8 text-center text-blanco">
           <Pata c="mx-auto mb-2 h-8 w-8 text-hoja" />No se encontraron postulantes con esos criterios. Pruebe con otro nombre o quite los filtros.
         </div>
       ) : (
         <ul className="grid gap-2">
           {lista.map((p) => (
             <li key={p.id}>
-              <button onClick={() => setFichaId(p.id)} className="w-full rounded-2xl border border-tinta/10 bg-blanco p-3 text-left shadow-sm hover:border-vet/40">
+              <button onClick={() => setFichaId(p.id)} className="w-full rounded-2xl border border-vet/20 bg-claro p-3 text-left text-tinta shadow-md hover:border-vet">
                 <div className="flex flex-wrap items-start gap-2">
-                  <div className="min-w-0 flex-1"><p className="break-words font-display font-bold">{p.nombre}</p><p className="text-sm text-tinta/70">{p.puesto} · {p.sede}</p></div>
+                  <div className="min-w-0 flex-1"><p className="break-words font-display font-bold">{p.nombre}</p><p className="text-sm text-tinta/80">{p.puesto} · {p.sede}</p></div>
                   <span className={`rounded-full px-2 py-1 text-xs font-bold ${etapaCls[p.etapa]}`}>{p.etapa}</span>
                 </div>
                 {(conDemora(p, now) || avisarPostulante(datos, p)) && <div className="mt-2 flex flex-wrap gap-1">{conDemora(p, now) && <Demora />}{avisarPostulante(datos, p) && <Cubiertas />}</div>}
@@ -254,7 +258,10 @@ function Ficha({ p, datos, actualizar, avisar, onClose }: { p: Postulante; datos
   const mv = (e: Etapa) => { const r = mover(datos, p.id, e); if (r.error) setErrMov(r.error); else { setErrMov(""); actualizar(r.datos); avisar(`Movido a «${e}»`); } };
   const enviar = (c: "Correo" | "WhatsApp") => { set({ ...p, mensajes: [sendMessage(p, c), ...p.mensajes] }); avisar("Enviado"); };
   const sig: Partial<Record<Etapa, Etapa>> = { "Postuló": "Entrevistado", "Entrevistado": "Oferta enviada" };
-  const sec = "rounded-2xl border border-tinta/10 p-3";
+  const sec = "rounded-2xl border border-vet/20 bg-blanco p-3 shadow-sm";
+  const cub = avisarPostulante(datos, p);
+  const llenas = p.etapa === "Oferta enviada" && cubiertas(datos, p.sede, p.puesto);
+  const rechazar = () => { const r = rechazarPorCupo(datos, p.id); if (r.error) setErrMov(r.error); else { setErrMov(""); actualizar(r.datos); avisar("Movido a «Rechazado»"); } };
 
   return (
     <Modal titulo={p.nombre} onClose={onClose}>
@@ -273,7 +280,7 @@ function Ficha({ p, datos, actualizar, avisar, onClose }: { p: Postulante; datos
               <dt className="font-semibold">WhatsApp</dt><dd>{p.whatsapp ? telFmt(p.whatsapp) : "No registrado"}</dd>
               <dt className="font-semibold">Correo</dt><dd className="break-all">{p.correo || "No registrado"}</dd>
             </dl>
-            <button className={`${bSec} mt-3 w-full`} onClick={() => setEditar(true)}>Editar datos</button>
+            <button className={`${aSec} mt-3 w-full`} onClick={() => setEditar(true)}>Editar datos</button>
           </section>
           <section className={sec}>
             <div className="flex flex-wrap items-center gap-2"><h3 className="flex-1 font-display font-bold">Etapa actual</h3><span className={`rounded-full px-2 py-1 text-xs font-bold ${etapaCls[p.etapa]}`}>{p.etapa}</span></div>
@@ -281,33 +288,35 @@ function Ficha({ p, datos, actualizar, avisar, onClose }: { p: Postulante; datos
             <ol className="mt-2 grid gap-1 text-sm">{ETAPAS.filter((e) => p.fechas[e]).map((e) => <li key={e}>• {e}: {fmt(p.fechas[e])}</li>)}</ol>
             {errMov && <p role="alert" className="mt-2 rounded-xl border border-vet bg-vet/10 p-3 text-sm font-semibold">⚠ {errMov}</p>}
             <div className="mt-3 grid gap-2">
-              {sig[p.etapa] && <button className={bPri} onClick={() => mv(sig[p.etapa]!)}>Mover a la siguiente etapa</button>}
-              {p.etapa === "Oferta enviada" && <div className="grid grid-cols-2 gap-2"><button className={`${btn} bg-hoja text-blanco`} onClick={() => mv("Contratado")}>Contratado</button><button className={bSec} onClick={() => mv("Rechazado")}>Rechazado</button></div>}
+              {sig[p.etapa] && <button className={aPri} onClick={() => mv(sig[p.etapa]!)}>Mover a la siguiente etapa</button>}
+              {p.etapa === "Oferta enviada" && <div className="grid grid-cols-2 gap-2"><button className={aPri} disabled={llenas} onClick={() => mv("Contratado")}>Contratado</button>{cub ? <button className={aSec} onClick={rechazar}>Rechazar: plazas cubiertas</button> : <button className={aSec} onClick={() => mv("Rechazado")}>Rechazado</button>}</div>}
+              {llenas && <p role="alert" className="text-sm font-semibold">⚠ Todas las plazas de {p.puesto} en {p.sede} ya están contratadas. No se puede contratar.</p>}
+              {sig[p.etapa] && cub && <button className={aSec} onClick={rechazar}>Rechazar: plazas cubiertas</button>}
               {(p.etapa === "Contratado" || p.etapa === "Rechazado") && <p className="text-sm text-tinta/70">Proceso finalizado: no hay más movimientos.</p>}
             </div>
           </section>
           {(p.correo || p.whatsapp) && (
             <section className={`${sec} grid grid-cols-2 gap-2`}>
-              {p.correo && <button className={bSec} onClick={() => enviar("Correo")}>Enviar correo</button>}
-              {p.whatsapp && <button className={bSec} onClick={() => enviar("WhatsApp")}>Enviar WhatsApp</button>}
+              {p.correo && <button className={aSec} onClick={() => enviar("Correo")}>Enviar correo</button>}
+              {p.whatsapp && <button className={aSec} onClick={() => enviar("WhatsApp")}>Enviar WhatsApp</button>}
             </section>
           )}
           <section className={sec}>
             <h3 className="font-display font-bold">Notas de entrevista</h3>
             <form className="mt-2 grid gap-2" onSubmit={(e) => { e.preventDefault(); if (!nota.trim()) return; set({ ...p, notas: [...p.notas, { fecha: new Date().toISOString(), texto: nota.trim() }] }); setNota(""); avisar("Nota agregada"); }}>
-              <textarea className={`${inp} min-h-20 py-2`} value={nota} onChange={(e) => setNota(e.target.value)} placeholder="Escriba la nota de la entrevista" aria-label="Nueva nota" />
-              <button className={bPri} disabled={!nota.trim()}>Agregar nota</button>
+              <textarea className={`${aInp} min-h-20 py-2`} value={nota} onChange={(e) => setNota(e.target.value)} placeholder="Escriba la nota de la entrevista" aria-label="Nueva nota" />
+              <button className={aPri} disabled={!nota.trim()}>Agregar nota</button>
             </form>
             <ul className="mt-3 grid gap-2">
               {[...p.notas].sort((a, b) => b.fecha.localeCompare(a.fecha)).map((n, i) => <li key={i} className="rounded-xl bg-vet/5 p-2 text-sm"><p className="text-xs font-bold text-vet">{fmt(n.fecha)}</p>{n.texto}</li>)}
-              {!p.notas.length && <li className="text-sm text-tinta/60">Aún no hay notas registradas.</li>}
+              {!p.notas.length && <li className="text-sm text-tinta/80">Aún no hay notas registradas.</li>}
             </ul>
           </section>
           <section className={sec}>
             <h3 className="font-display font-bold">Historial de mensajes</h3>
             <ul className="mt-2 grid gap-2">
               {p.mensajes.map((m, i) => <li key={i} className="rounded-xl bg-hoja/10 p-2 text-sm"><p className="text-xs font-bold text-vet">{m.canal} · {fmt(m.fecha)} · Enviado</p>{m.texto}</li>)}
-              {!p.mensajes.length && <li className="text-sm text-tinta/60">Aún no se han enviado mensajes.</li>}
+              {!p.mensajes.length && <li className="text-sm text-tinta/80">Aún no se han enviado mensajes.</li>}
             </ul>
           </section>
         </div>
@@ -335,26 +344,26 @@ function Vacantes({ datos, actualizar, admin, avisar }: { datos: Datos; actualiz
     <div className="grid gap-4">
       <h1 className="font-display text-2xl font-bold">Vacantes</h1>
       {admin && (
-        <form noValidate className="grid gap-3 rounded-2xl bg-vet/5 p-3 sm:grid-cols-4 sm:items-start" onSubmit={(ev) => { ev.preventDefault(); crear(); }}>
+        <form noValidate className={`grid gap-3 ${card} p-3 sm:grid-cols-4 sm:items-start`} onSubmit={(ev) => { ev.preventDefault(); crear(); }}>
           <h2 className="font-display font-bold sm:col-span-4">Nueva vacante</h2>
-          <div><select className={inp} aria-label="Sede" value={f.sede} onChange={(ev) => setF({ ...f, sede: ev.target.value })}><option value="">Sede…</option>{SEDES.map((s) => <option key={s}>{s}</option>)}</select>{err("sede")}</div>
-          <div><select className={inp} aria-label="Puesto" value={f.puesto} onChange={(ev) => setF({ ...f, puesto: ev.target.value })}><option value="">Puesto…</option>{PUESTOS.map((s) => <option key={s}>{s}</option>)}</select>{err("puesto")}</div>
-          <div><input className={inp} aria-label="Cantidad de plazas" type="number" min={1} step={1} inputMode="numeric" value={f.plazas} onChange={(ev) => setF({ ...f, plazas: ev.target.value })} />{err("plazas")}</div>
-          <button className={bPri}>Agregar vacante</button>
+          <div><select className={aInp} aria-label="Sede" value={f.sede} onChange={(ev) => setF({ ...f, sede: ev.target.value })}><option value="">Sede…</option>{SEDES.map((s) => <option key={s}>{s}</option>)}</select>{err("sede")}</div>
+          <div><select className={aInp} aria-label="Puesto" value={f.puesto} onChange={(ev) => setF({ ...f, puesto: ev.target.value })}><option value="">Puesto…</option>{PUESTOS.map((s) => <option key={s}>{s}</option>)}</select>{err("puesto")}</div>
+          <div><input className={aInp} aria-label="Cantidad de plazas" type="number" min={1} step={1} inputMode="numeric" value={f.plazas} onChange={(ev) => setF({ ...f, plazas: ev.target.value })} />{err("plazas")}</div>
+          <button className={aPri}>Agregar vacante</button>
         </form>
       )}
       <div className="grid gap-3 sm:grid-cols-2">
         {SEDES.map((s) => {
           const tot = PUESTOS.reduce((a, p) => a + plazasDe(datos, s, p), 0);
           const occ = PUESTOS.reduce((a, p) => a + Math.min(ocupadas(datos, s, p), plazasDe(datos, s, p)), 0);
-          const estado = tot === 0 ? ["Sin vacantes", "bg-tinta/10 text-tinta/70"] : occ >= tot ? ["Completa", "bg-hoja text-blanco"] : ["Con plazas disponibles", "bg-vet text-blanco"];
+          const estado = tot === 0 ? ["Sin vacantes", "border border-vet bg-et1 text-tinta"] : occ >= tot ? ["Completa", "bg-hoja text-tinta"] : ["Con plazas disponibles", "bg-vet text-blanco"];
           return (
-            <section key={s} className="rounded-2xl border border-tinta/10 p-3 shadow-sm">
+            <section key={s} className={`${card} p-3`}>
               <div className="flex flex-wrap items-center gap-2"><h2 className="flex-1 font-display text-lg font-bold">{s}</h2><span className={`rounded-full px-2 py-1 text-xs font-bold ${estado[1]}`}>{estado[0]}</span></div>
-              {tot === 0 ? <p className="mt-2 text-sm text-tinta/60">No hay vacantes abiertas en esta sede.</p> : PUESTOS.filter((p) => plazasDe(datos, s, p)).map((p) => {
+              {tot === 0 ? <p className="mt-2 text-sm text-tinta/80">No hay vacantes abiertas en esta sede.</p> : PUESTOS.filter((p) => plazasDe(datos, s, p)).map((p) => {
                 const t = plazasDe(datos, s, p), o = ocupadas(datos, s, p);
                 return (
-                  <div key={p} className="mt-3 rounded-xl bg-vet/5 p-3">
+                  <div key={p} className="mt-3 rounded-xl bg-blanco p-3">
                     <div className="flex items-center gap-2"><p className="flex-1 font-semibold">{p}</p><p className="text-sm font-bold">{o} de {t} plazas ocupadas</p></div>
                     <div className="mt-2 h-2 overflow-hidden rounded-full bg-tinta/10"><div className="h-full bg-hoja" style={{ width: `${Math.min(100, (o / t) * 100)}%` }} /></div>
                     <div className="mt-2 flex flex-wrap gap-1">{ETAPAS.map((e) => <span key={e} className={`rounded-full px-2 py-1 text-xs font-semibold ${etapaCls[e]}`}>{e}: {datos.postulantes.filter((x) => x.sede === s && x.puesto === p && x.etapa === e).length}</span>)}</div>

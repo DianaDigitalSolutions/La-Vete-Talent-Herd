@@ -34,14 +34,14 @@ export const plazasDe = (d: Datos, sede: Sede, puesto: Puesto) =>
   d.vacantes.filter((v) => v.sede === sede && v.puesto === puesto).reduce((a, v) => a + v.plazas, 0);
 const contar = (d: Datos, sede: Sede, puesto: Puesto, etapas: Etapa[]) =>
   d.postulantes.filter((p) => p.sede === sede && p.puesto === puesto && etapas.includes(p.etapa)).length;
-export const ocupadas = (d: Datos, s: Sede, p: Puesto) => contar(d, s, p, ["Oferta enviada", "Contratado"]);
+export const ocupadas = (d: Datos, s: Sede, p: Puesto) => contar(d, s, p, ["Contratado"]);
 export const disponibles = (d: Datos, s: Sede, p: Puesto) => Math.max(0, plazasDe(d, s, p) - ocupadas(d, s, p));
 export const cubiertas = (d: Datos, s: Sede, p: Puesto) => {
   const t = plazasDe(d, s, p);
   return t > 0 && contar(d, s, p, ["Contratado"]) >= t;
 };
 export const avisarPostulante = (d: Datos, p: Postulante) =>
-  (p.etapa === "Postuló" || p.etapa === "Entrevistado") && cubiertas(d, p.sede, p.puesto);
+  (p.etapa === "Postuló" || p.etapa === "Entrevistado" || p.etapa === "Oferta enviada") && cubiertas(d, p.sede, p.puesto);
 export const conDemora = (p: Postulante, now = Date.now()) =>
   p.etapa === "Entrevistado" && !!p.fechas.Entrevistado && now - new Date(p.fechas.Entrevistado).getTime() > 5 * DIA;
 
@@ -62,9 +62,18 @@ export function mover(d: Datos, id: string, destino: Etapa): { datos: Datos; err
     "Oferta enviada": ["Contratado", "Rechazado"], "Contratado": [], "Rechazado": [],
   };
   if (!permitidos[p.etapa].includes(destino)) return { datos: d, error: "No se pueden saltear etapas." };
-  if (destino === "Oferta enviada" && ocupadas(d, p.sede, p.puesto) >= plazasDe(d, p.sede, p.puesto))
-    return { datos: d, error: `No quedan plazas disponibles de ${p.puesto} en ${p.sede}. No se puede enviar la oferta.` };
+  if (destino === "Contratado" && ocupadas(d, p.sede, p.puesto) >= plazasDe(d, p.sede, p.puesto))
+    return { datos: d, error: `Todas las plazas de ${p.puesto} en ${p.sede} ya están contratadas. No se puede contratar.` };
   const np = { ...p, etapa: destino, fechas: { ...p.fechas, [destino]: new Date().toISOString() } };
+  return { datos: { ...d, postulantes: d.postulantes.map((x) => (x.id === id ? np : x)) } };
+}
+
+/** Rechazo manual: solo para quien muestra «Plazas cubiertas: avisar al postulante». */
+export function rechazarPorCupo(d: Datos, id: string): { datos: Datos; error?: string } {
+  const p = d.postulantes.find((x) => x.id === id);
+  if (!p || !avisarPostulante(d, p)) return { datos: d, error: "Este postulante no puede rechazarse por plazas cubiertas." };
+  const f = new Date().toISOString();
+  const np: Postulante = { ...p, etapa: "Rechazado", fechas: { ...p.fechas, Rechazado: f }, notas: [...p.notas, { fecha: f, texto: "Rechazado: plazas de la sede ya cubiertas" }] };
   return { datos: { ...d, postulantes: d.postulantes.map((x) => (x.id === id ? np : x)) } };
 }
 
@@ -116,6 +125,7 @@ export function seed(now = Date.now()): Datos {
       mk("Andrés Calderón Ureña", "Veterinario", "Escazú", "Contratado", 5, "88990011", ["Especialidad en imagenología."]),
       mk("Sofía Brenes Arias", "Veterinario", "Escazú", "Postuló", 2, "72224488"),
       mk("Esteban Víquez Campos", "Veterinario", "Escazú", "Entrevistado", 2, "", ["Recién graduado, muy buena disposición."]),
+      mk("Melissa Cordero Fallas", "Veterinario", "Escazú", "Oferta enviada", 1, "88112233"),
       mk("Valeria Montero-Castro", "Auxiliar", "Escazú", "Postuló", 0, "64447788"),
       mk("Luis Diego Alfaro Segura", "Auxiliar", "Escazú", "Oferta enviada", 1, "85556677"),
       mk("Mariana Céspedes León", "Veterinario", "San Pedro", "Entrevistado", 1, "86667788", ["Interés en medicina de animales exóticos."]),
