@@ -9,7 +9,7 @@ describe("Reglas La Vete", () => {
     expect(mover(d, p.id, "Entrevistado").datos.postulantes.find((x) => x.id === p.id)!.etapa).toBe("Entrevistado");
   });
   it("bloquea oferta sin plazas (San Pedro Auxiliar 1 plaza ya con oferta)", () => {
-    const d2 = { ...d, postulantes: [...d.postulantes, { ...d.postulantes[0], id: "x", sede: "San Pedro" as const, puesto: "Auxiliar" as const, etapa: "Entrevistado" as const }] };
+    const d2 = { ...d, postulantes: [...d.postulantes, { ...d.postulantes[0]!, id: "x", sede: "San Pedro" as const, puesto: "Auxiliar" as const, etapa: "Entrevistado" as const }] };
     expect(mover(d2, "x", "Oferta enviada").error).toBeTruthy();
   });
   it("alta: rechaza sin vacante o con todo contratado, permite con oferta pendiente", () => {
