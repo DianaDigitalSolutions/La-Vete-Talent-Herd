@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   ADMIN_CLAVE, ETAPAS, PUESTOS, SEDES, agregarVacante, avisarPostulante, cargar, conDemora, cubiertas, rechazarPorCupo, correoValido,
-  disponibles, errorAlta, fmt, guardar, mover, normalizar, ocupadas, plazasDe, sendMessage, telValido, textoSugerido, uid,
+  disponibles, errorAlta, fmt, guardar, mover, normalizar, ocupadas, plazasDe, sendMessage, textoSugerido, uid,
   type Datos, type Etapa, type Postulante, type Puesto, type Sede,
 } from "@/lib/vete";
 
@@ -141,8 +141,6 @@ function validar(f: Form) {
   if (!f.nombre.trim()) e.nombre = "Ingrese el nombre.";
   if (!f.puesto) e.puesto = "Seleccione el puesto.";
   if (!f.sede) e.sede = "Seleccione la sede.";
-  if (f.telefono && !telValido(f.telefono)) e.telefono = "Ingrese 8 dígitos (ej.: 8888-8888).";
-  if (f.whatsapp && !telValido(f.whatsapp)) e.whatsapp = "Ingrese 8 dígitos (ej.: 8888-8888).";
   if (f.correo && !correoValido(f.correo)) e.correo = "Ingrese un correo válido.";
   return e;
 }
