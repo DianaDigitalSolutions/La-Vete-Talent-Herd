@@ -159,10 +159,10 @@ function FormPostulante({ inicial, onGuardar, aviso }: { inicial: Form; onGuarda
       {campo("nombre", "Nombre completo *", <input id="nombre" className={aInp} value={f.nombre} onChange={set("nombre")} />)}
       {campo("puesto", "Puesto *", <select id="puesto" className={aInp} value={f.puesto} onChange={set("puesto")}><option value="">Seleccione…</option>{PUESTOS.map((p) => <option key={p}>{p}</option>)}</select>)}
       {campo("sede", "Sede *", <select id="sede" className={aInp} value={f.sede} onChange={set("sede")}><option value="">Seleccione…</option>{SEDES.map((s) => <option key={s}>{s}</option>)}</select>)}
+      {aviso && <p key={aviso} ref={(el) => el?.scrollIntoView({ block: "center" })} role="alert" className="rounded-xl border border-vet bg-vet/10 p-3 text-sm font-semibold text-tinta">⚠ {aviso}</p>}
       {campo("telefono", "Teléfono", <input id="telefono" inputMode="tel" className={aInp} value={f.telefono} onChange={set("telefono")} placeholder="8888-8888" />)}
       {campo("whatsapp", "WhatsApp", <input id="whatsapp" inputMode="tel" className={aInp} value={f.whatsapp} onChange={set("whatsapp")} placeholder="8888-8888" />)}
       {campo("correo", "Correo", <input id="correo" type="email" className={aInp} value={f.correo} onChange={set("correo")} placeholder="nombre@correo.cr" />)}
-      {aviso && <p role="alert" className="rounded-xl border border-vet bg-vet/10 p-3 text-sm font-semibold text-tinta">⚠ {aviso}</p>}
       <button className={aPri}>Guardar</button>
     </form>
   );
