@@ -24,10 +24,10 @@ type Perfil = "rrhh" | "admin";
 const btn = "min-h-11 rounded-xl px-4 font-semibold transition active:scale-[.98] disabled:opacity-50";
 const bPri = `${btn} bg-vet text-blanco hover:bg-vet/90`;
 const bSec = `${btn} border border-vet/30 bg-blanco text-vet hover:bg-vet/5`;
-const aPri = `${btn} bg-hoja font-bold text-tinta hover:bg-hoja/90 disabled:opacity-60`;
-const aSec = `${btn} bg-vet text-blanco hover:bg-vet/90 disabled:opacity-60`;
-const aInp = "min-h-11 w-full rounded-xl border border-vet bg-campo px-3 text-base text-tinta placeholder:text-tinta/75 focus:outline-none focus:ring-2 focus:ring-vet/40";
-const card = "rounded-2xl border border-vet/20 bg-claro text-tinta shadow-md";
+const aPri = `${btn} bg-[#6FAE7B] font-bold text-[#16303E] hover:bg-[#6FAE7B]/90 disabled:opacity-60`;
+const aSec = `${btn} bg-[#1F5C7A] text-[#FFFFFF] hover:bg-[#1F5C7A]/90 disabled:opacity-60`;
+const aInp = "min-h-11 w-full rounded-xl border border-[#1F5C7A] bg-[#F7FBFD] px-3 text-base text-[#16303E] placeholder:text-[#16303E]/75 focus:outline-none focus:ring-2 focus:ring-vet/40";
+const card = "rounded-2xl border border-[#CFE3EC] bg-[#EAF3F7] text-[#16303E] shadow-md";
 const inp = "min-h-11 w-full rounded-xl border border-tinta/20 bg-blanco px-3 text-base text-tinta focus:border-vet focus:outline-none focus:ring-2 focus:ring-vet/30";
 
 const etapaCls: Record<Etapa, string> = {
@@ -46,10 +46,10 @@ const Pata = ({ c = "h-6 w-6" }: { c?: string }) => (
 );
 
 function Demora() {
-  return <span className="inline-flex items-center gap-1 rounded-full bg-tinta px-2 py-1 text-xs font-semibold text-blanco"><Reloj />Más de 5 días sin avanzar</span>;
+  return <span className="inline-flex items-center gap-1 rounded-full bg-[#16303E] px-2 py-1 text-xs font-semibold text-[#FFFFFF]"><Reloj />Más de 5 días sin avanzar</span>;
 }
 function Cubiertas() {
-  return <span className="inline-flex rounded-full border border-hoja-oscuro bg-hoja px-2 py-1 text-xs font-semibold text-tinta">Plazas cubiertas: avisar al postulante</span>;
+  return <span className="inline-flex rounded-full bg-[#6FAE7B] px-2 py-1 text-xs font-semibold text-[#16303E]">Plazas cubiertas: avisar al postulante</span>;
 }
 
 function Index() {
@@ -67,19 +67,19 @@ function Index() {
   const total = datos.vacantes.reduce((a, v) => a + v.plazas, 0);
 
   return (
-    <div className="min-h-screen bg-vet text-base leading-relaxed text-blanco">
-      <header className="sticky top-0 z-20 bg-vet-oscuro text-blanco shadow-md" style={{ paddingTop: "env(safe-area-inset-top)" }}>
+    <div className="min-h-screen bg-[#1F5C7A] text-base leading-relaxed text-[#FFFFFF]" style={{ colorScheme: "light" }}>
+      <header className="sticky top-0 z-20 bg-[#17475F] text-[#FFFFFF] shadow-md" style={{ paddingTop: "env(safe-area-inset-top)" }}>
         <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-3 gap-y-1 px-4 py-2 sm:flex-nowrap">
           <div className="min-w-0 flex-1">
             <p className="font-display text-xl font-extrabold leading-tight">La Vete</p>
-            <p className="text-xs text-blanco"><span>{perfil === "admin" ? "Administración" : "RRHH"}</span><span className="hidden sm:inline"> · Total de vacantes: <b className="text-hoja">{total}</b></span></p>
+            <p className="text-xs text-blanco"><span>{perfil === "admin" ? "Administración" : "RRHH"}</span><span className="hidden sm:inline"> · Total de vacantes: <b className="font-bold text-[#FFFFFF]">{total}</b></span></p>
           </div>
-          <button className={`${btn} shrink-0 border border-blanco/30 text-sm text-blanco hover:bg-blanco/10`} onClick={() => setPerfil(null)}>Cambiar de perfil</button>
-          <p className="order-last w-full min-w-0 text-xs text-blanco sm:hidden">Total de vacantes: <b className="text-hoja">{total}</b></p>
+          <button className={`${btn} shrink-0 border border-[#FFFFFF] text-sm text-[#FFFFFF] hover:bg-[#FFFFFF]/10`} onClick={() => setPerfil(null)}>Cambiar de perfil</button>
+          <p className="order-last w-full min-w-0 text-xs text-blanco sm:hidden">Total de vacantes: <b className="font-bold text-[#FFFFFF]">{total}</b></p>
         </div>
         <nav className="mx-auto flex max-w-5xl px-2">
           {([["post", "Postulaciones"], ["vac", "Vacantes"]] as const).map(([k, l]) => (
-            <button key={k} onClick={() => setTab(k)} className={`min-h-11 flex-1 border-b-4 font-display font-bold ${tab === k ? "border-hoja bg-blanco/15 text-blanco" : "border-transparent text-blanco/85"}`}>{l}</button>
+            <button key={k} onClick={() => setTab(k)} className={`min-h-11 flex-1 border-b-4 font-display font-bold ${tab === k ? "border-[#6FAE7B] bg-[#FFFFFF] text-[#1F5C7A]" : "border-transparent text-[#FFFFFF]"}`}>{l}</button>
           ))}
         </nav>
       </header>
@@ -122,7 +122,7 @@ function Bienvenida({ onEntrar }: { onEntrar: (p: Perfil) => void }) {
 function Modal({ titulo, onClose, children }: { titulo: string; onClose: () => void; children: ReactNode }) {
   return (
     <div className="fixed inset-0 z-40 flex items-end justify-center bg-tinta/60 sm:items-center sm:p-4" onClick={onClose}>
-      <div className="flex max-h-[100dvh] w-full max-w-lg flex-col rounded-t-3xl bg-claro text-tinta shadow-xl sm:max-h-[90dvh] sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
+      <div className="flex max-h-[100dvh] w-full max-w-lg flex-col rounded-t-3xl border border-[#CFE3EC] bg-[#EAF3F7] text-[#16303E] shadow-xl sm:max-h-[90dvh] sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center gap-2 border-b border-tinta/10 px-4 py-2">
           <h2 className="min-w-0 flex-1 truncate font-display text-lg font-bold">{titulo}</h2>
           <button aria-label="Cerrar" className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-tinta/5" onClick={onClose}>
@@ -193,9 +193,9 @@ function Postulaciones({ datos, actualizar, avisar }: { datos: Datos; actualizar
       </div>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
         {ETAPAS.map((e) => (
-          <button key={e} onClick={() => setFEtapa(fEtapa === e ? "" : e)} className={`min-h-11 rounded-2xl border p-3 text-left ${fEtapa === e ? "border-vet ring-2 ring-vet/30" : "border-tinta/10"} ${etapaCls[e]}`}>
+          <button key={e} onClick={() => setFEtapa(fEtapa === e ? "" : e)} className={`min-h-11 rounded-2xl border p-3 text-left ${fEtapa === e ? "border-[#1F5C7A] ring-2 ring-[#1F5C7A]/30" : "border-[#CFE3EC]"} ${cntCls[e]}`}>
             <p className="font-display text-2xl font-extrabold">{datos.postulantes.filter((p) => p.etapa === e).length}</p>
-            <p className="text-xs font-semibold">{e}</p>
+            <p className="text-sm">{e}</p>
           </button>
         ))}
       </div>
@@ -223,7 +223,7 @@ function Postulaciones({ datos, actualizar, avisar }: { datos: Datos; actualizar
         <ul className="grid gap-2">
           {lista.map((p) => (
             <li key={p.id}>
-              <button onClick={() => setFichaId(p.id)} className="w-full rounded-2xl border border-vet/20 bg-claro p-3 text-left text-tinta shadow-md hover:border-vet">
+              <button onClick={() => setFichaId(p.id)} className="w-full rounded-2xl border border-[#CFE3EC] bg-[#EAF3F7] p-3 text-left text-[#16303E] shadow-md hover:border-[#1F5C7A]">
                 <div className="flex flex-wrap items-start gap-2">
                   <div className="min-w-0 flex-1"><p className="break-words font-display font-bold">{p.nombre}</p><p className="text-sm text-tinta/80">{p.puesto} · {p.sede}</p></div>
                   <span className={`rounded-full px-2 py-1 text-xs font-bold ${etapaCls[p.etapa]}`}>{p.etapa}</span>
@@ -359,16 +359,16 @@ function Vacantes({ datos, actualizar, admin, avisar }: { datos: Datos; actualiz
         {SEDES.map((s) => {
           const tot = PUESTOS.reduce((a, p) => a + plazasDe(datos, s, p), 0);
           const occ = PUESTOS.reduce((a, p) => a + Math.min(ocupadas(datos, s, p), plazasDe(datos, s, p)), 0);
-          const estado = tot === 0 ? ["Sin vacantes", "border border-vet bg-et1 text-tinta"] : occ >= tot ? ["Completa", "bg-hoja text-tinta"] : ["Con plazas disponibles", "bg-vet text-blanco"];
+          const estado = tot === 0 ? ["Sin vacantes", "border border-vet bg-et1 text-tinta"] : occ >= tot ? ["Completa", "bg-hoja text-tinta"] : ["Con plazas disponibles", "bg-[#CDE6D1] text-[#16303E]"];
           return (
-            <section key={s} className="rounded-2xl border border-[#9FC4D6] bg-[#EAF3F7] p-4 text-[#16303E] shadow-[0_2px_8px_rgba(22,48,62,0.12)]">
+            <section key={s} className="rounded-2xl border border-[#CFE3EC] bg-[#EAF3F7] p-4 text-[#16303E] shadow-[0_2px_8px_rgba(22,48,62,0.12)]">
               <div className="flex flex-wrap items-center gap-2"><h2 className="flex-1 font-display text-lg font-bold text-[#1F5C7A]">{s}</h2><span className={`rounded-full px-2 py-1 text-xs font-bold ${estado[1]}`}>{estado[0]}</span></div>
               {tot === 0 ? <p className="mt-2 text-sm text-[#16303E]">No hay vacantes abiertas en esta sede.</p> : PUESTOS.filter((p) => plazasDe(datos, s, p)).map((p) => {
                 const t = plazasDe(datos, s, p), o = ocupadas(datos, s, p);
                 return (
                   <div key={p} className="mt-3 rounded-xl bg-[#FFFFFF] p-3 text-[#16303E]">
-                    <div className="flex items-center gap-2"><p className="flex-1 text-sm font-semibold text-[#16303E]">{p}</p><p className="text-sm font-bold text-[#16303E]">{o} de {t} plazas ocupadas</p></div>
-                    <div className="mt-2 h-2 overflow-hidden rounded-full bg-[#CFE3EC]"><div className="h-full bg-[#6FAE7B]" style={{ width: `${Math.min(100, (o / t) * 100)}%` }} /></div>
+                    <div className="flex items-center gap-2"><p className="flex-1 text-sm font-semibold text-[#16303E]">{p}</p><p className="text-sm font-bold text-[#16303E]">{o} de {t} plazas cubiertas</p></div>
+                    <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-[#CFE3EC]"><div className="h-full bg-[#6FAE7B]" style={{ width: `${Math.min(100, (o / t) * 100)}%` }} /></div>
                     <div className="mt-2 flex flex-wrap gap-1">{ETAPAS.map((e) => <span key={e} className={`rounded-full px-2 py-1 text-sm ${cntCls[e]}`}>{e}: <b>{datos.postulantes.filter((x) => x.sede === s && x.puesto === p && x.etapa === e).length}</b></span>)}</div>
                   </div>
                 );

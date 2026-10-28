@@ -12,6 +12,13 @@ npm run dev
 ```
 Pruebas de reglas: `bunx vitest run`.
 
+## Estructura del proyecto
+- `src/routes/index.tsx`: todas las pantallas (bienvenida, Postulaciones, Vacantes, fichas, formularios y ventanas emergentes).
+- `src/lib/vete.ts`: reglas, sedes, puestos, etapas, clave, datos de ejemplo, localStorage y envío simulado (`sendMessage`).
+- `src/routes/__root.tsx`: estructura base de la página y carga de fuentes.
+- `src/styles.css`: paleta de colores y tipografías.
+- `src/test/`: pruebas automáticas de las reglas.
+
 ## Clave de administración
 **`vet2026`** (en `src/lib/vete.ts`, constante `ADMIN_CLAVE`).
 
@@ -40,7 +47,7 @@ Quien esté en «Entrevistado» más de 5 días muestra «Más de 5 días sin av
 - El total de vacantes de la cadena (cabecera) es solo informativo.
 
 ## Correo y WhatsApp (simulado)
-Los botones «Enviar correo» y «Enviar WhatsApp» de la ficha están **simulados en el código**: la función `sendMessage` en `src/lib/vete.ts` (comentario «SIMULADO: reemplazar por integración real») genera el mensaje y lo registra en el historial de la ficha. Los envíos ocurren únicamente al pulsar el botón, una entrada por pulsación; nada más genera envíos. Para la integración real, reemplace esa función; la interfaz no cambia.
+Los botones «Enviar correo» y «Enviar WhatsApp» de la ficha están **simulados en el código**: la función `sendMessage` en `src/lib/vete.ts` (comentario «SIMULADO: reemplazar por integración real») genera el mensaje y lo registra en el historial de la ficha. Los envíos ocurren únicamente al pulsar el botón, una entrada por pulsación; nada más genera envíos. Para la integración real, reemplace esa función; la interfaz no cambia. No hay pagos ni otras integraciones.
 
 ## Datos de ejemplo
 Se cargan solo si `localStorage` está vacío o corrupto: 19 postulantes en Curridabat, Escazú, San Pedro y Heredia, en todas las etapas, con fechas relativas al día actual. Incluye 3 en «Entrevistado» con más de 5 días, nombres con acento/guion (María-José Araya, Valeria Montero-Castro) y Escazú·Veterinario con todas sus plazas contratadas y una oferta enviada.
@@ -60,7 +67,5 @@ Clave: **`lavete-datos-v1`**. Para restablecer los datos: en la consola del nave
 
 ## Notas
 - Los datos se guardan en cada dispositivo y navegador (localStorage). Lo que se carga en un dispositivo no aparece en otro; la sincronización entre dispositivos y usuarios requiere el backend que integrará Kodarvia.
-- La app usa la paleta azul veterinario en modo claro.
-
-## Próximos pasos
-Kodarvia integrará backend, políticas de acceso y despliegue.
+- Las pantallas internas usan la paleta azul veterinario en modo claro.
+- Kodarvia integrará el backend, las políticas y el despliegue.
