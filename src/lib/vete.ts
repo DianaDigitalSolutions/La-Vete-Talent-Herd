@@ -88,7 +88,7 @@ export const textoSugerido = (p: Postulante) =>
 
 /** SIMULADO: reemplazar por integración real. No realiza ninguna llamada de red; solo devuelve el registro para el historial. */
 export function sendMessage(canal: "Correo" | "WhatsApp", texto: string, asunto?: string): Mensaje {
-  return { fecha: new Date().toISOString(), canal, texto, ...(canal === "Correo" ? { asunto } : {}) };
+  return { fecha: new Date().toISOString(), canal, texto, ...(canal === "Correo" && asunto !== undefined ? { asunto } : {}) };
 }
 
 export function seed(now = Date.now()): Datos {
