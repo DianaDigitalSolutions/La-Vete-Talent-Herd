@@ -47,7 +47,8 @@ Quien esté en «Entrevistado» más de 5 días muestra «Más de 5 días sin av
 - El total de vacantes de la cadena (cabecera) es solo informativo.
 
 ## Correo y WhatsApp (simulado)
-Los botones «Enviar correo» y «Enviar WhatsApp» de la ficha están **simulados en el código**: la función `sendMessage` en `src/lib/vete.ts` (comentario «SIMULADO: reemplazar por integración real») genera el mensaje y lo registra en el historial de la ficha. Los envíos ocurren únicamente al pulsar el botón, una entrada por pulsación; nada más genera envíos. Para la integración real, reemplace esa función; la interfaz no cambia. No hay pagos ni otras integraciones.
+Los botones «Enviar correo» y «Enviar WhatsApp» de la ficha (visibles solo si el dato existe) abren la ventana **«Redactar mensaje»**: destinatario de solo lectura, «Asunto» editable (solo correo) y un cuadro de texto libre con un texto sugerido que puede borrarse o cambiarse. Nada se registra hasta pulsar **«Enviar»** (deshabilitado si el texto está vacío y durante un segundo tras pulsar): entonces se guarda en el historial de la ficha con la fecha y el texto tal como quedó, y aparece el aviso «Enviado». «Cancelar», la «×» o tocar fuera cierran sin registrar nada. Abrir fichas, recargar, mover de etapa, contratar o rechazar no generan mensajes.
+Los envíos están **simulados en el código**: la función `sendMessage` en `src/lib/vete.ts` (comentario «SIMULADO: reemplazar por integración real») es el punto donde Kodarvia conectará la integración real. No hay pagos ni otras integraciones.
 
 ## Datos de ejemplo
 Se cargan solo si `localStorage` está vacío o corrupto: 19 postulantes en Curridabat, Escazú, San Pedro y Heredia, en todas las etapas, con fechas relativas al día actual. Incluye 3 en «Entrevistado» con más de 5 días, nombres con acento/guion (María-José Araya, Valeria Montero-Castro) y Escazú·Veterinario con todas sus plazas contratadas y una oferta enviada.
@@ -67,5 +68,5 @@ Clave: **`lavete-datos-v1`**. Para restablecer los datos: en la consola del nave
 
 ## Notas
 - Los datos se guardan en cada dispositivo y navegador (localStorage). Lo que se carga en un dispositivo no aparece en otro; la sincronización entre dispositivos y usuarios requiere el backend que integrará Kodarvia.
-- Las pantallas internas usan la paleta azul veterinario en modo claro.
+- La app usa siempre modo claro (`color-scheme: light`, sin modo oscuro) con la paleta azul veterinario.
 - Kodarvia integrará el backend, las políticas y el despliegue.

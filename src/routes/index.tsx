@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   ADMIN_CLAVE, ETAPAS, PUESTOS, SEDES, agregarVacante, avisarPostulante, cargar, conDemora, cubiertas, rechazarPorCupo, correoValido,
-  disponibles, errorAlta, fmt, guardar, mover, normalizar, ocupadas, plazasDe, sendMessage, telValido, uid,
+  disponibles, errorAlta, fmt, guardar, mover, normalizar, ocupadas, plazasDe, sendMessage, telValido, textoSugerido, uid,
   type Datos, type Etapa, type Postulante, type Puesto, type Sede,
 } from "@/lib/vete";
 
@@ -259,7 +259,11 @@ function Ficha({ p, datos, actualizar, avisar, onClose }: { p: Postulante; datos
   const set = (np: Postulante) => actualizar({ ...datos, postulantes: datos.postulantes.map((x) => (x.id === p.id ? np : x)) });
   const mv = (e: Etapa) => { const r = mover(datos, p.id, e); if (r.error) setErrMov(r.error); else { setErrMov(""); actualizar(r.datos); avisar(`Movido a «${e}»`); } };
   const [enviando, setEnviando] = useState(false);
-  const enviar = (c: "Correo" | "WhatsApp") => { if (enviando) return; setEnviando(true); setTimeout(() => setEnviando(false), 1000); const m = sendMessage(p, c); set({ ...p, mensajes: [m, ...p.mensajes] }); avisar("Enviado"); };
+  const [redactar, setRedactar] = useState<"Correo" | "WhatsApp" | null>(null);
+  const [asunto, setAsunto] = useState("");
+  const [cuerpo, setCuerpo] = useState("");
+  const abrir = (c: "Correo" | "WhatsApp") => { setAsunto("Su postulación en La Vete"); setCuerpo(textoSugerido(p)); setRedactar(c); };
+  const enviar = () => { if (enviando || !redactar || !cuerpo.trim()) return; setEnviando(true); setTimeout(() => setEnviando(false), 1000); const m = sendMessage(redactar, cuerpo, asunto); set({ ...p, mensajes: [m, ...p.mensajes] }); setRedactar(null); avisar("Enviado"); };
   const sig: Partial<Record<Etapa, Etapa>> = { "Postuló": "Entrevistado", "Entrevistado": "Oferta enviada" };
   const sec = "rounded-2xl border border-vet/20 bg-blanco p-3 shadow-sm";
   const cub = avisarPostulante(datos, p);
@@ -300,8 +304,8 @@ function Ficha({ p, datos, actualizar, avisar, onClose }: { p: Postulante; datos
           </section>
           {(p.correo || p.whatsapp) && (
             <section className={`${sec} grid grid-cols-2 gap-2`}>
-              {p.correo && <button className={aSec} disabled={enviando} onClick={() => enviar("Correo")}>Enviar correo</button>}
-              {p.whatsapp && <button className={aSec} disabled={enviando} onClick={() => enviar("WhatsApp")}>Enviar WhatsApp</button>}
+              {p.correo && <button className={aSec} disabled={enviando} onClick={() => abrir("Correo")}>Enviar correo</button>}
+              {p.whatsapp && <button className={aSec} disabled={enviando} onClick={() => abrir("WhatsApp")}>Enviar WhatsApp</button>}
             </section>
           )}
           <section className={sec}>
@@ -318,11 +322,30 @@ function Ficha({ p, datos, actualizar, avisar, onClose }: { p: Postulante; datos
           <section className={sec}>
             <h3 className="font-display font-bold">Historial de mensajes</h3>
             <ul className="mt-2 grid gap-2">
-              {p.mensajes.map((m, i) => <li key={i} className="rounded-xl bg-hoja/10 p-2 text-sm"><p className="text-xs font-bold text-vet">{m.canal} · {fmt(m.fecha)} · Enviado</p>{m.texto}</li>)}
+              {p.mensajes.map((m, i) => <li key={i} className="rounded-xl bg-hoja/10 p-2 text-sm"><p className="text-xs font-bold text-vet">{m.canal} · {fmt(m.fecha)} · Enviado</p>{m.asunto && <p className="font-semibold">Asunto: {m.asunto}</p>}<p className="whitespace-pre-wrap">{m.texto}</p></li>)}
               {!p.mensajes.length && <li className="text-sm text-tinta/80">Aún no se han enviado mensajes.</li>}
             </ul>
           </section>
         </div>
+      )}
+      {redactar && (
+        <Modal titulo="Redactar mensaje" onClose={() => setRedactar(null)}>
+          <div className="grid gap-3 text-[#16303E]">
+            <label className="grid gap-1 text-sm font-semibold">Para ({redactar === "Correo" ? "correo" : "WhatsApp"})
+              <input className="min-h-11 w-full rounded-xl border border-[#1F5C7A] bg-[#F7FBFD] px-3 text-base font-normal text-[#16303E]" readOnly value={redactar === "Correo" ? p.correo : telFmt(p.whatsapp)} />
+            </label>
+            {redactar === "Correo" && <label className="grid gap-1 text-sm font-semibold">Asunto
+              <input className="min-h-11 w-full rounded-xl border border-[#1F5C7A] bg-[#F7FBFD] px-3 text-base font-normal text-[#16303E]" value={asunto} onChange={(e) => setAsunto(e.target.value)} />
+            </label>}
+            <label className="grid gap-1 text-sm font-semibold">Mensaje
+              <textarea className="min-h-32 w-full rounded-xl border border-[#1F5C7A] bg-[#F7FBFD] px-3 py-2 text-base font-normal text-[#16303E]" value={cuerpo} onChange={(e) => setCuerpo(e.target.value)} />
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              <button className={aPri} disabled={enviando || !cuerpo.trim()} onClick={enviar}>Enviar</button>
+              <button className={aSec} onClick={() => setRedactar(null)}>Cancelar</button>
+            </div>
+          </div>
+        </Modal>
       )}
     </Modal>
   );

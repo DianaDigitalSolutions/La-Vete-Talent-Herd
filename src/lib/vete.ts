@@ -7,7 +7,7 @@ export type Etapa = (typeof ETAPAS)[number];
 
 export interface Vacante { id: string; sede: Sede; puesto: Puesto; plazas: number }
 export interface Nota { fecha: string; texto: string }
-export interface Mensaje { fecha: string; canal: "Correo" | "WhatsApp"; texto: string }
+export interface Mensaje { fecha: string; canal: "Correo" | "WhatsApp"; texto: string; asunto?: string }
 export interface Postulante {
   id: string; nombre: string; puesto: Puesto; sede: Sede;
   telefono: string; whatsapp: string; correo: string;
@@ -83,10 +83,12 @@ export function agregarVacante(d: Datos, sede: Sede, puesto: Puesto, plazas: num
   return { ...d, vacantes: [...d.vacantes, { id: uid(), sede, puesto, plazas }] };
 }
 
-/** SIMULADO: reemplazar por integración real de correo / WhatsApp. No realiza ninguna llamada de red. */
-export function sendMessage(p: Postulante, canal: "Correo" | "WhatsApp"): Mensaje {
-  const texto = `Estimado(a) ${p.nombre}: le contactamos de La Vete en relación con su postulación al puesto de ${p.puesto} en la sede ${p.sede}. Su etapa actual es «${p.etapa}».`;
-  return { fecha: new Date().toISOString(), canal, texto };
+export const textoSugerido = (p: Postulante) =>
+  `Estimado(a) ${p.nombre}: le saludamos de La Vete respecto a su postulación como ${p.puesto} en la sede de ${p.sede}. Saludos cordiales, Recursos Humanos de La Vete.`;
+
+/** SIMULADO: reemplazar por integración real. No realiza ninguna llamada de red; solo devuelve el registro para el historial. */
+export function sendMessage(canal: "Correo" | "WhatsApp", texto: string, asunto?: string): Mensaje {
+  return { fecha: new Date().toISOString(), canal, texto, ...(canal === "Correo" && asunto !== undefined ? { asunto } : {}) };
 }
 
 export function seed(now = Date.now()): Datos {
