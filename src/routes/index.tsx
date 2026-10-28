@@ -100,7 +100,6 @@ function Bienvenida({ onEntrar }: { onEntrar: (p: Perfil) => void }) {
       <div className="w-full max-w-md rounded-3xl bg-blanco p-6 text-tinta shadow-xl">
         <div className="flex items-center gap-2 text-vet"><Pata c="h-8 w-8 text-hoja" /><span className="font-display text-3xl font-extrabold">La Vete</span></div>
         <h1 className="mt-3 font-display text-2xl font-bold leading-tight">Sistema de control de vacantes y postulantes</h1>
-        <p className="mt-2 text-sm text-tinta/70">Más de 40 años cuidando a sus mascotas. Seleccione su perfil para continuar.</p>
         {!admin ? (
           <div className="mt-6 grid gap-3">
             <button className={`${bPri} min-h-14 text-lg`} onClick={() => onEntrar("rrhh")}>RRHH</button>
