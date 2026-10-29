@@ -1,4 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { FranjaAlmacenamiento } from "@/components/FranjaAlmacenamiento";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   ADMIN_CLAVE, ETAPAS, PUESTOS, SEDES, agregarVacante, avisarPostulante, cargar, conDemora, cubiertas, rechazarPorCupo, correoValido,
@@ -62,12 +63,13 @@ function Index() {
   const actualizar = (d: Datos) => { setDatos(d); guardar(d); };
   const avisar = (m: string) => { setToast(m); setTimeout(() => setToast(""), 2500); };
 
-  if (!perfil) return <Bienvenida onEntrar={setPerfil} />;
+  if (!perfil) return <><FranjaAlmacenamiento /><Bienvenida onEntrar={setPerfil} /></>;
   if (!datos) return null;
   const total = datos.vacantes.reduce((a, v) => a + v.plazas, 0);
 
   return (
     <div className="min-h-screen bg-[#1F5C7A] text-base leading-relaxed text-[#FFFFFF]" style={{ colorScheme: "light" }}>
+      <FranjaAlmacenamiento />
       <header className="sticky top-0 z-20 bg-[#17475F] text-[#FFFFFF] shadow-md" style={{ paddingTop: "env(safe-area-inset-top)" }}>
         <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-3 gap-y-1 px-4 py-2 sm:flex-nowrap">
           <div className="min-w-0 flex-1">
@@ -75,6 +77,7 @@ function Index() {
             <p className="text-xs text-blanco"><span>{perfil === "admin" ? "Administración" : "RRHH"}</span><span className="hidden sm:inline"> · Total de vacantes: <b className="font-bold text-[#FFFFFF]">{total}</b></span></p>
           </div>
           <button className={`${btn} shrink-0 border border-[#FFFFFF] text-sm text-[#FFFFFF] hover:bg-[#FFFFFF]/10`} onClick={() => setPerfil(null)}>Cambiar de perfil</button>
+          <Link to="/" className={`${btn} inline-flex shrink-0 items-center border border-[#FFFFFF] text-sm text-[#FFFFFF] hover:bg-[#FFFFFF]/10`}>Ir a la página principal</Link>
           <p className="order-last w-full min-w-0 text-xs text-blanco sm:hidden">Total de vacantes: <b className="font-bold text-[#FFFFFF]">{total}</b></p>
         </div>
         <nav className="mx-auto flex max-w-5xl px-2">
@@ -114,6 +117,7 @@ function Bienvenida({ onEntrar }: { onEntrar: (p: Perfil) => void }) {
             <button type="button" className={bSec} onClick={() => { setAdmin(false); setClave(""); setErr(""); }}>Volver</button>
           </form>
         )}
+        <Link to="/" className="mt-4 inline-flex min-h-11 w-full items-center justify-center text-sm font-semibold text-vet underline">Volver a la página principal</Link>
       </div>
     </div>
   );

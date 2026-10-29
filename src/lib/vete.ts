@@ -1,3 +1,4 @@
+import { notificarAlmacenamiento } from "./almacenamiento";
 export const SEDES = ["Curridabat", "Escazú", "San Pedro", "Tibás", "Heredia", "Alajuela", "Cartago"] as const;
 export const PUESTOS = ["Veterinario", "Auxiliar"] as const;
 export const ETAPAS = ["Postuló", "Entrevistado", "Oferta enviada", "Contratado", "Rechazado"] as const;
@@ -159,5 +160,5 @@ export function cargar(): Datos {
   return s;
 }
 export function guardar(d: Datos) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); } catch { /* sin almacenamiento: la app sigue en memoria */ }
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); notificarAlmacenamiento(true); } catch { notificarAlmacenamiento(false); /* sin almacenamiento: la app sigue en memoria */ }
 }
