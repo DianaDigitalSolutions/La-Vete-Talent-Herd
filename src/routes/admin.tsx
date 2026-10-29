@@ -6,7 +6,7 @@ import {
   type Datos, type Etapa, type Postulante, type Puesto, type Sede,
 } from "@/lib/vete";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
       { title: "La Vete · Sistema de control de vacantes y postulantes" },
